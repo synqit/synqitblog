@@ -1,114 +1,143 @@
 ---
 import { Image } from 'astro:assets';
 import { getCollection } from 'astro:content';
-import BaseHead from '../../components/BaseHead.astro';
-import Footer from '../../components/Footer.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
 import FormattedDate from '../../components/FormattedDate.astro';
-import Header from '../../components/Header.astro';
 import { SITE_DESCRIPTION, SITE_TITLE } from '../../consts';
 
-const posts = (await getCollection('blog')).sort(
-	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
-);
+const posts = (await getCollection('blog'))
+  .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
 ---
 
-<!doctype html>
-<html lang="en">
-	<head>
-		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
-		<style>
-			main {
-				width: 960px;
-			}
-			ul {
-				display: flex;
-				flex-wrap: wrap;
-				gap: 2rem;
-				list-style-type: none;
-				margin: 0;
-				padding: 0;
-			}
-			ul li {
-				width: calc(50% - 1rem);
-			}
-			ul li * {
-				text-decoration: none;
-				transition: 0.2s ease;
-			}
-			ul li:first-child {
-				width: 100%;
-				margin-bottom: 1rem;
-				text-align: center;
-			}
-			ul li:first-child img {
-				width: 100%;
-			}
-			ul li:first-child .title {
-				font-size: 2.369rem;
-			}
-			ul li img {
-				margin-bottom: 0.5rem;
-				border-radius: 12px;
-			}
-			ul li a {
-				display: block;
-			}
-			.title {
-				margin: 0;
-				color: rgb(var(--black));
-				line-height: 1;
-			}
-			.date {
-				margin: 0;
-				color: rgb(var(--gray));
-			}
-			ul li a:hover h4,
-			ul li a:hover .date {
-				color: rgb(var(--accent));
-			}
-			ul a:hover img {
-				box-shadow: var(--box-shadow);
-			}
-			@media (max-width: 720px) {
-				ul {
-					gap: 0.5em;
-				}
-				ul li {
-					width: 100%;
-					text-align: center;
-				}
-				ul li:first-child {
-					margin-bottom: 0;
-				}
-				ul li:first-child .title {
-					font-size: 1.563em;
-				}
-			}
-		</style>
-	</head>
-	<body>
-		<Header />
-		<main>
-			<section>
-				<ul>
-					{
-						posts.map((post) => (
-							<li>
-								<a href={`${import.meta.env.BASE_URL}/blog/${post.id}/`}>
-									{post.data.heroImage && (
-										<Image width={720} height={360} src={post.data.heroImage} alt="" />
-									)}
-									<h4 class="title">{post.data.title}</h4>
-									<p class="date">
-										<FormattedDate date={post.data.pubDate} />
-									</p>
-								</a>
-							</li>
-						))
-					}
-				</ul>
-			</section>
-		</main>
-		<Footer />
-	</body>
-</html>
+<BaseLayout title={`${SITE_TITLE} — Blog`} description={SITE_DESCRIPTION}>
+  <section class="pagehead">
+    <p class="pill">Blog</p>
+    <h1>Posts</h1>
+    <p class="lead">Korte how-to’s, notes en experimenten. Nieuwste bovenaan.</p>
+  </section>
+
+  <section>
+    <ul class="grid">
+      {posts.map((post) => (
+        <li class="card">
+          <a class="cardlink" href={`${import.meta.env.BASE_URL}blog/${post.id}/`}>
+            {post.data.heroImage && (
+              <div class="thumb">
+                <Image width={1200} height={600} src={post.data.heroImage} alt="" />
+              </div>
+            )}
+
+            <div class="content">
+              <h2 class="title">{post.data.title}</h2>
+              <p class="meta">
+                <FormattedDate date={post.data.pubDate} />
+              </p>
+              {post.data.description && <p class="desc">{post.data.description}</p>}
+            </div>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <style>
+    .pagehead {
+      padding: 0.5rem 0 1.75rem;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.85rem;
+      padding: 0.35rem 0.7rem;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 999px;
+      color: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(8px);
+    }
+
+    h1 {
+      margin: 0.9rem 0 0.6rem;
+      font-size: clamp(2.1rem, 4.2vw, 3rem);
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      color: #f8fafc;
+      text-shadow:
+        0 0 12px rgba(56, 189, 248, 0.35),
+        0 0 28px rgba(167, 139, 250, 0.25);
+    }
+
+    .lead {
+      margin: 0;
+      max-width: 70ch;
+      color: rgba(255, 255, 255, 0.72);
+      font-size: 1.05rem;
+    }
+
+    .grid {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      gap: 1rem;
+      grid-template-columns: repeat(12, 1fr);
+    }
+
+    .card {
+      grid-column: span 12;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 1.2rem;
+      background: rgba(255, 255, 255, 0.06);
+      overflow: hidden;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
+      transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(255, 255, 255, 0.22);
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .cardlink {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .thumb :global(img) {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .content {
+      padding: 1rem 1.1rem 1.1rem;
+    }
+
+    .title {
+      margin: 0;
+      font-size: 1.25rem;
+      line-height: 1.25;
+    }
+
+    .meta {
+      margin: 0.5rem 0 0.7rem;
+      color: rgba(255, 255, 255, 0.62);
+      font-size: 0.95rem;
+    }
+
+    .desc {
+      margin: 0;
+      color: rgba(255, 255, 255, 0.72);
+    }
+
+    @media (min-width: 720px) {
+      .card {
+        grid-column: span 6;
+      }
+    }
+  </style>
+</BaseLayout>
