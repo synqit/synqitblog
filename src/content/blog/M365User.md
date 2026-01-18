@@ -2,6 +2,7 @@
 title: "How to create a new user in the Microsoft 365 admin portal"
 description: "Creating a new user in the Microsoft 365 Admin Portal – beginner level"
 pubDate: 2026-01-17
+heroImage: '../../assets/m365guides.png'
 ---
 
 So you are new to Microsoft 365 — or maybe you are not new, but you have never created a user before.  
